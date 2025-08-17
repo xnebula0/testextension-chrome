@@ -1,13 +1,229 @@
+<!DOCTYPE html>
 <html>
-  <style>
-    .box{
-      background: powderblue;
-      border: 5px solid black;
-      border-radius: 5px;
-      display: inline-block;
-    }
-  </style>
-  <div class="box">
-    Test
-  </div>
+  <head>
+    <title>Cosmos RNG</title>
+    <style>
+      .welcomebox {
+        background-color: powderblue;
+        border: 5px solid black;
+        border-radius: 10px;
+        padding: 15px;
+        margin: auto;
+        display: inline-block;
+      }
+
+      .discdiv {
+        background-color: mediumseagreen;
+        padding: 10px;
+        border-radius: 5px;
+        border: 2px solid black;
+        display: inline-block;
+      }
+
+      .statsdiv {
+        background-color: slateblue;
+        padding: 10px;
+        border-radius: 5px;
+        border: 2px solid black;
+        display: inline-block;
+        float: left;
+        margin: 5px;
+      }
+
+      .shopdiv {
+        background-color: violet;
+        padding: 10px;
+        border-radius: 5px;
+        border: 2px solid black;
+        display: inline-block;
+        float: left;
+        margin: 5px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="welcomebox">
+      <h1>Welcome! Press the button to roll!</h1>
+      <button onclick="roll()" id="rollbutton">Roll!</button>
+    </div>
+
+    <h2 id="rollOutput">Roll will be displayed here</h2>
+
+    <hr />
+
+    <div class="discdiv">
+      <h1>Discoveries:</h1>
+      <p><b>Common:</b> <span id="commondisc">False</span></p>
+      <p><b>Uncommon:</b> <span id="uncommondisc">False</span></p>
+      <p><b>Rare:</b> <span id="raredisc">False</span></p>
+      <p><b>Epic:</b> <span id="epicdisc">False</span></p>
+      <p><b>Legendary:</b> <span id="legenddisc">False</span></p>
+      <p><b>Mythical:</b> <span id="mythicdisc">False</span></p>
+      <p><b>Divine:</b> <span id="divinedisc">False</span></p>
+    </div>
+
+    <div class="statsdiv">
+      <h1>Stats:</h1>
+      <p>Rolls: <span id="rollcount">0</span></p>
+      <p><b>Common Count:</b> <span id="commonCount">0</span></p>
+      <p><b>Uncommon Count:</b> <span id="uncommonCount">0</span></p>
+      <p><b>Rare Count:</b> <span id="rareCount">0</span></p>
+      <p><b>Epic Count:</b> <span id="epicCount">0</span></p>
+      <p><b>Legendary Count:</b> <span id="legendCount">0</span></p>
+      <p><b>Mythical Count:</b> <span id="mythicCount">0</span></p>
+      <p><b>Divine Count:</b> <span id="divineCount">0</span></p>
+      <p><b>Immortal Count:</b> <span id="immortalCount">0</span></p>
+    </div>
+
+    <div class="shopdiv">
+      <h1>Shop:</h1>
+      <p><b>Luck Enhancer I: 5 Rares</b></p>
+      <button onclick="luck1()">Purchase!</button>
+      <p><b>Luck Enhancer II: 15 Rares and 5 Legendaries</b></p>
+      <button onclick="luck2()">Purchase!</button>
+    </div>
+
+    <p id="outputtest">Debug Roll Value</p>
+
+    <script>
+      let roll_count = 0;
+      let commonCount = 0, uncommonCount = 0, rareCount = 0, epicCount = 0, legendaryCount = 0, mythicalCount = 0, divineCount = 0;
+      let luckBoost = false;
+      let luckBoost2 = false;
+
+      function saveGame() {
+        const data = {
+          roll_count,
+          commonCount,
+          uncommonCount,
+          rareCount,
+          epicCount,
+          legendaryCount,
+          mythicalCount,
+          divineCount,
+          luckBoost,
+          luckBoost2
+        };
+        localStorage.setItem("cosmosRNGsave", JSON.stringify(data));
+      }
+
+      function loadGame() {
+        const saved = localStorage.getItem("cosmosRNGsave");
+        if (saved) {
+          const data = JSON.parse(saved);
+          roll_count = data.roll_count || 0;
+          commonCount = data.commonCount || 0;
+          uncommonCount = data.uncommonCount || 0;
+          rareCount = data.rareCount || 0;
+          epicCount = data.epicCount || 0;
+          legendaryCount = data.legendaryCount || 0;
+          mythicalCount = data.mythicalCount || 0;
+          divineCount = data.divineCount || 0;
+          luckBoost = data.luckBoost || false;
+          luckBoost2 = data.luckBoost2 || false;
+          updateDisplay(); //chatgpt made game saving and a LOT of bug fixing
+        }
+      }
+
+      function updateDisplay() {
+        document.getElementById("rollcount").innerText = roll_count;
+        document.getElementById("commonCount").innerText = commonCount;
+        document.getElementById("uncommonCount").innerText = uncommonCount;
+        document.getElementById("rareCount").innerText = rareCount;
+        document.getElementById("epicCount").innerText = epicCount;
+        document.getElementById("legendCount").innerText = legendaryCount;
+        document.getElementById("mythicCount").innerText = mythicalCount;
+        document.getElementById("divineCount").innerText = divineCount;
+      }
+
+      function roll() {
+        let min = 1;
+        if (luckBoost2) {
+          min = 799.9;
+        } else if (luckBoost) {
+          min = 501;
+        }
+
+        let max = 850;
+        let x = (Math.random() * (max - min) + min).toFixed(1);
+        document.getElementById("outputtest").innerText = x;
+
+        let z = "";
+
+        if (x < 500) {
+          z = "Common! 50%";
+          commonCount++;
+          document.getElementById("commondisc").innerText = "True";
+        } else if (x >= 500 && x <= 749.9) {
+          z = "Uncommon! 25%";
+          uncommonCount++;
+          document.getElementById("uncommondisc").innerText = "True";
+        } else if (x >= 750 && x <= 799.9) {
+          z = "Rare! 5%";
+          rareCount++;
+          document.getElementById("raredisc").innerText = "True";
+        } else if (x >= 800 && x <= 824.8) {
+          z = "Epic! 2.5%";
+          epicCount++;
+          document.getElementById("epicdisc").innerText = "True";
+        } else if (x >= 825 && x <= 829.9) {
+          z = "Legendary! 0.5%";
+          legendaryCount++;
+          document.getElementById("legenddisc").innerText = "True";
+        } else if (x >= 830 && x <= 832.5) {
+          z = "Mythical! 0.25%";
+          mythicalCount++;
+          document.getElementById("mythicdisc").innerText = "True";
+        } else if (x >= 832.6 && x <= 832.8) {
+          z = "Divine! 0.03%";
+          divineCount++;
+          document.getElementById("divinedisc").innerText = "True";
+        } else if (x >= 832.8 && x <= 832.9) {
+          z = "Immortal! 0.02%";
+          immortalCount++;
+          document.getElementById("immortaldisc").innerText = "True";
+        }
+
+        roll_count++;
+        document.getElementById("rollOutput").innerText = z;
+        updateDisplay();
+        saveGame();
+      }
+
+      function luck1() {
+        if (luckBoost) {
+          alert("Luck Enhancer I already purchased!");
+          return;
+        }
+        if (rareCount >= 5) {
+          rareCount -= 5;
+          luckBoost = true;
+          alert("Luck Enhancer I activated! Rolls will now skip Common tier.");
+          updateDisplay();
+          saveGame();
+        } else {
+          alert("You need at least 5 Rares to buy this!");
+        }
+      }
+
+      function luck2() {
+        if (luckBoost2) {
+          alert("Luck Enhancer II already purchased!");
+          return;
+        }
+        if (rareCount >= 15 && legendaryCount >= 5) {
+          rareCount -= 15;
+          legendaryCount -= 5;
+          luckBoost2 = true;
+          alert("Luck Enhancer II activated! Rolls will now skip Uncommon tier.");
+          updateDisplay();
+          saveGame();
+        } else {
+          alert("You need at least 15 Rares and 5 Legendaries to buy this!");
+        }
+      }
+
+      window.onload = loadGame;
+    </script>
+  </body>
 </html>
